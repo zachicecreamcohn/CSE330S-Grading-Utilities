@@ -1,0 +1,10 @@
+M4-Autograder/.idea
+M4-Autograder/collect_grades/__pycache__
+M4-Autograder/collect_grades/.DS_Store
+M4-Autograder/collect_grades/repos
+M4-Autograder/.DS_Store
+grades_to_canvas/.idea
+grades_to_canvas/__pycache__
+grades_to_canvas/.DS_Store
+.DS_Store
+M4-Autograder/.env
