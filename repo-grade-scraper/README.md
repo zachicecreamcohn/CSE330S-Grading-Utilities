@@ -66,6 +66,22 @@ for example, if we had `module-1.json` for `cse330-fall-2024` org_name, we would
 python3 grading.py cse330-fall-2024 1
 ```
 
+## Running both simultaneously
+
+If you are weird like me and want it all to magically happen with one command, run
+
+```bash
+cd util && python3 mappings_to_json.py <module_number> && cd .. && python3 grading.py <org_name> <module_number>
+```
+
+For Example:
+
+```bash
+cd util && python3 mappings_to_json.py 1 && cd .. && python3 grading.py cse330-fall-2024 1
+```
+
+Please note that this is not windows friendly (unless you are in bash) #nohate.
+
 ---
 
 If you have any questions, feel free to reach out to [Jayce Bordelon](https://jaycebordelon.netlify.app):
