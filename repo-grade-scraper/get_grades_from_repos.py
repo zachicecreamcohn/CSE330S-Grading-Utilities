@@ -140,7 +140,7 @@ def main():
     success_count = len(parsed_grades)
     total_count = len(repo_names)
     print(f"\nProcessing complete:")
-    print(f"  Total repos: {total_count}")
+    print(f"  Total students: {total_count}")
     print(f"  Successfully processed: {success_count}")
     print(f"  Failed to process: {total_count - success_count}")
     print(f"  Success rate: {success_count / total_count:.2%}")
