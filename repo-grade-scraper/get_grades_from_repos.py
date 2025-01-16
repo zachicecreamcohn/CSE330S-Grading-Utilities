@@ -77,10 +77,8 @@ def confirm_repo_names_are_ok(repo_names):
 
 def find_grade_in_readme(readme_content, repo_url, module_type: ModuleType):
     """Extract grade details and student ID from the README content."""
-    total_earned, total_possible, student_ids = None, None, []
+    total_earned, total_possible, student_ids = None, None, set() # Set to prevent duplicate student_id entries
     lines = readme_content.splitlines()
-    max_ids = 1 if module_type == ModuleType.INDIVIDUAL else 2
-
     for i, line in enumerate(lines):
         if total_earned is None and "Total Earned" in line and i + 2 < len(lines):
             data_line = lines[i + 2].split('|')
@@ -88,12 +86,10 @@ def find_grade_in_readme(readme_content, repo_url, module_type: ModuleType):
                 total_earned = data_line[1].strip()
                 total_possible = data_line[2].strip()
 
-        match_all = re.findall(r"\b\d{6}\b", line)
-        if match_all:
-            student_ids.extend(match_all)
+        matches = re.findall(r"\b\d{6}\b", line)
+        student_ids.update(matches)
 
-        if total_earned and total_possible and len(student_ids) == max_ids:
-            # If a group module has been completed by a single student, this will not trigger. That's okay
+        if total_earned and total_possible and student_ids:
             break
 
     if not total_earned:
@@ -101,7 +97,6 @@ def find_grade_in_readme(readme_content, repo_url, module_type: ModuleType):
     if len(student_ids) == 0:
         write_to_error_log(repo_url, Error.NO_STUDENT_ID)
 
-    # returning None for some or all of the values is fine. It's handled when called.
     return total_earned, total_possible, student_ids
 
 
@@ -132,11 +127,11 @@ def process_single_repo(repo, base_url, parsed_grades, module_type: ModuleType):
         with open(readme_path, "r") as readme_file:
             readme_content = readme_file.read()
 
+        # TODO: make sure this works
         total_earned, total_possible, student_ids = find_grade_in_readme(readme_content, full_repo_url, module_type)
         if total_earned and total_possible and len(student_ids) > 0:
             for student_id in student_ids:
                 parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned})
-
             print(f"[SUCCESS] Parsed grade: {total_earned}/{total_possible} for {full_repo_url}.")
         else:
             print(f"[ERROR] Incomplete grade data for {full_repo_url}.")
