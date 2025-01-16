@@ -8,7 +8,9 @@ from threading import Lock
 from enum import Enum
 from datetime import datetime
 
-# TODO: Switch from str "group" or "individual" to Enum
+class ModuleType(Enum):
+    GROUP = "group"
+    INDIVIDUAL = "individual"
 
 class Error(Enum):
     NO_README = "README.md not found"
@@ -39,7 +41,7 @@ def write_to_error_log(problematic_repo_url: str, error_type: Error):
 
 def parse_repo_names_from_txt(module_number, group_or_individual):
     """Parse repository names from the specified text file."""
-    file_type = "individual" if group_or_individual == "individual" else "group"
+    file_type = ModuleType.INDIVIDUAL if group_or_individual == "individual" else ModuleType.GROUP
     repo_mapping_file_path = f"./text-grader-mappings/module-{module_number}-{file_type}.txt"
 
     repo_names = []
@@ -63,11 +65,11 @@ def confirm_repo_names_are_ok(repo_names):
         exit()
 
 
-def find_grade_in_readme(readme_content, repo_url, repo_type):
+def find_grade_in_readme(readme_content, repo_url, repo_type: ModuleType):
     """Extract grade details and student ID from the README content."""
     total_earned, total_possible, student_ids = None, None, []
     lines = readme_content.splitlines()
-    max_ids = 1 if repo_type == "individual" else 2
+    max_ids = 1 if repo_type == ModuleType.INDIVIDUAL else 2
 
     for i, line in enumerate(lines):
         if total_earned is None and "Total Earned" in line and i + 2 < len(lines):
@@ -93,7 +95,7 @@ def find_grade_in_readme(readme_content, repo_url, repo_type):
     return total_earned, total_possible, student_ids
 
 
-def process_single_repo(repo, base_url, parsed_grades, repo_type):
+def process_single_repo(repo, base_url, parsed_grades, repo_type: ModuleType):
     """Process a single repository to parse grades."""
     full_repo_url = f"{base_url}{repo}"
     repo_path = f"./temporary-repo-directory/{repo}"
@@ -169,6 +171,8 @@ def main():
 
     module_number = args.module_number
     group_or_individual = args.group_or_individual
+    if group_or_individual not in {ModuleType.GROUP.value, ModuleType.INDIVIDUAL.value}:
+        print(f"You must specify either 'group' or 'individual' repo type. Received: {group_or_individual}")
     org_name = args.org_name
 
     print(f"Processing module {module_number} ({group_or_individual}) repositories.")
