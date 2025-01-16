@@ -8,6 +8,7 @@ grades_to_canvas/__pycache__
 grades_to_canvas/.DS_Store
 .DS_Store
 M4-Autograder/.env
-grade-scraper/temporary-repo-directory/
-grade-scraper/grades/
-grade-scraper/util/json-files/
+# Repo Scraper Ignore
+repo-grade-scraper/grades
+repo-grade-scraper/temporary-repo-directory
+repo-grade-scraper/util/json-files
