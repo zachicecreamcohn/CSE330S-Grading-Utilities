@@ -11,5 +11,6 @@ M4-Autograder/.env
 # Repo Scraper Ignore
 repo-grade-scraper/temporary-repo-directory
 repo-grade-scraper/results
+repo-grade-scraper/error_log*
 # Grading Template to Repo Script Ignore
 grading-template-to-repos/temporary-repo-directory
