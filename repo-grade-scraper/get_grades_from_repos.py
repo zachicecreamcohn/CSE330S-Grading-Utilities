@@ -34,7 +34,7 @@ def confirm_repo_names_are_ok(repo_names):
 
 def find_grade_in_readme(readme_content):
     """Extract grade details and student ID from the README content."""
-    total_earned, total_possible, student_ids = None, None, set()
+    total_earned, total_possible, student_ids = None, None, set() # Set to prevent duplicate student_id entries
     lines = readme_content.splitlines()
     for i, line in enumerate(lines):
         if total_earned is None and "Total Earned" in line and i + 2 < len(lines):
@@ -81,7 +81,7 @@ def process_single_repo(repo, base_url, parsed_grades):
         if total_earned and total_possible and student_ids:
             parsed_grades.append({"STUDENT_ID": list(student_ids)[0], "GRADE": total_earned})
             if len(student_ids) > 1:
-                parsed_grades.append({"STUDENT_ID": list(student_ids)[1], "GRADE": total_earned})
+                parsed_grades.append({"STUDENT_ID": list(student_ids)[1], "GRADE": total_earned}) # For multiple parsed Student Id's
             print(f"[SUCCESS] Parsed grade: {total_earned}/{total_possible} for {full_repo_url}.")
         else:
             print(f"[ERROR] Incomplete grade data for {full_repo_url}.")
