@@ -4,7 +4,33 @@ import subprocess
 import re
 import csv
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
+from enum import Enum
 
+class Error(Enum):
+    NO_README = "README.md not found"
+    NO_GRADE = "Grade not found"
+    NO_BRANCH = "Grading branch not found"
+    NO_STUDENT_ID = "Student ID not found"
+    CLONE_FAILED = "Failed to clone repository"
+
+error_log_lock = Lock()
+
+def write_to_error_log(problematic_repo_url: str, error_type: Error, log_path: str = "./error_log.csv"):
+    """Write problematic repo and error message to a csv file."""
+
+    with error_log_lock:
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        try:
+            header_needed = not os.path.exists(log_path) or os.path.getsize(log_path) == 0
+            with open(log_path, mode='a', newline='', encoding='utf-8') as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=["REPO_URL", "ERROR"])
+                if header_needed:
+                    writer.writeheader()
+                writer.writerow({"REPO_URL": problematic_repo_url, "ERROR": error_type.value})
+
+        except IOError as e:
+            print(f"An IO error occurred: {e}")
 
 def parse_repo_names_from_txt(module_number, group_or_individual):
     """Parse repository names from the specified text file."""
@@ -32,7 +58,7 @@ def confirm_repo_names_are_ok(repo_names):
         exit()
 
 
-def find_grade_in_readme(readme_content):
+def find_grade_in_readme(readme_content, repo_url):
     """Extract grade details and student ID from the README content."""
     total_earned, total_possible, student_id = None, None, None
     lines = readme_content.splitlines()
@@ -52,6 +78,12 @@ def find_grade_in_readme(readme_content):
         if total_earned and total_possible and student_id:
             break
 
+    if not total_earned:
+        write_to_error_log(repo_url, Error.NO_GRADE)
+    if not student_id:
+        write_to_error_log(repo_url, Error.NO_STUDENT_ID)
+
+    # returning None for some or all of the values is fine. It's handled when called.
     return total_earned, total_possible, student_id
 
 
@@ -64,6 +96,7 @@ def process_single_repo(repo, base_url, parsed_grades):
     subprocess.run(["git", "clone", full_repo_url, repo_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if not os.path.exists(repo_path):
         print(f"[ERROR] Failed to clone {repo}. Skipping {full_repo_url}.")
+        write_to_error_log(full_repo_url, Error.CLONE_FAILED)
         return
 
     # Checkout the grading branch
@@ -71,6 +104,7 @@ def process_single_repo(repo, base_url, parsed_grades):
     result = subprocess.run(["git", "-C", repo_path, "checkout", branch_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if result.returncode != 0:
         print(f"[ERROR] Grading branch does not exist for {full_repo_url}.")
+        write_to_error_log(full_repo_url, Error.NO_BRANCH)
         subprocess.run(["rm", "-rf", repo_path], stdout=subprocess.DEVNULL)
         return
 
@@ -80,14 +114,16 @@ def process_single_repo(repo, base_url, parsed_grades):
         with open(readme_path, "r") as readme_file:
             readme_content = readme_file.read()
 
-        total_earned, total_possible, student_id = find_grade_in_readme(readme_content)
+        total_earned, total_possible, student_id = find_grade_in_readme(readme_content, full_repo_url)
         if total_earned and total_possible and student_id:
             parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned})
             print(f"[SUCCESS] Parsed grade: {total_earned}/{total_possible} for {full_repo_url}.")
         else:
             print(f"[ERROR] Incomplete grade data for {full_repo_url}.")
+            # no need to write to error log here, it's already done in find_grade_in_readme
     except FileNotFoundError:
         print(f"[ERROR] README.md not found in {full_repo_url}.")
+        write_to_error_log(full_repo_url, Error.NO_README)
 
     # Clean up the cloned repository
     subprocess.run(["rm", "-rf", repo_path], stdout=subprocess.DEVNULL)
