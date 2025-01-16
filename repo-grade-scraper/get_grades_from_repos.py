@@ -6,6 +6,9 @@ import csv
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from enum import Enum
+from datetime import datetime
+
+# TODO: Switch from str "group" or "individual" to Enum
 
 class Error(Enum):
     NO_README = "README.md not found"
@@ -15,15 +18,17 @@ class Error(Enum):
     CLONE_FAILED = "Failed to clone repository"
 
 error_log_lock = Lock()
+run_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+error_log_path = f"./error_log_{run_datetime}.csv"
 
-def write_to_error_log(problematic_repo_url: str, error_type: Error, log_path: str = "./error_log.csv"):
+def write_to_error_log(problematic_repo_url: str, error_type: Error):
     """Write problematic repo and error message to a csv file."""
 
     with error_log_lock:
-        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        os.makedirs(os.path.dirname(error_log_path), exist_ok=True)
         try:
-            header_needed = not os.path.exists(log_path) or os.path.getsize(log_path) == 0
-            with open(log_path, mode='a', newline='', encoding='utf-8') as csv_file:
+            header_needed = not os.path.exists(error_log_path) or os.path.getsize(error_log_path) == 0
+            with open(error_log_path, mode='a', newline='', encoding='utf-8') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=["REPO_URL", "ERROR"])
                 if header_needed:
                     writer.writeheader()
@@ -58,10 +63,11 @@ def confirm_repo_names_are_ok(repo_names):
         exit()
 
 
-def find_grade_in_readme(readme_content, repo_url):
+def find_grade_in_readme(readme_content, repo_url, repo_type):
     """Extract grade details and student ID from the README content."""
-    total_earned, total_possible, student_id = None, None, None
+    total_earned, total_possible, student_ids = None, None, []
     lines = readme_content.splitlines()
+    max_ids = 1 if repo_type == "individual" else 2
 
     for i, line in enumerate(lines):
         if total_earned is None and "Total Earned" in line and i + 2 < len(lines):
@@ -70,24 +76,24 @@ def find_grade_in_readme(readme_content, repo_url):
                 total_earned = data_line[1].strip()
                 total_possible = data_line[2].strip()
 
-        if student_id is None:
-            match = re.search(r"\b\d{6}\b", line)
-            if match:
-                student_id = match.group()
+        match_all = re.findall(r"\b\d{6}\b", line)
+        if match_all:
+            student_ids.extend(match_all)
 
-        if total_earned and total_possible and student_id:
+        if total_earned and total_possible and len(student_ids) == max_ids:
+            # If a group module has been completed by a single student, this will not trigger. That's okay
             break
 
     if not total_earned:
         write_to_error_log(repo_url, Error.NO_GRADE)
-    if not student_id:
+    if len(student_ids) == 0:
         write_to_error_log(repo_url, Error.NO_STUDENT_ID)
 
     # returning None for some or all of the values is fine. It's handled when called.
-    return total_earned, total_possible, student_id
+    return total_earned, total_possible, student_ids
 
 
-def process_single_repo(repo, base_url, parsed_grades):
+def process_single_repo(repo, base_url, parsed_grades, repo_type):
     """Process a single repository to parse grades."""
     full_repo_url = f"{base_url}{repo}"
     repo_path = f"./temporary-repo-directory/{repo}"
@@ -114,9 +120,11 @@ def process_single_repo(repo, base_url, parsed_grades):
         with open(readme_path, "r") as readme_file:
             readme_content = readme_file.read()
 
-        total_earned, total_possible, student_id = find_grade_in_readme(readme_content, full_repo_url)
-        if total_earned and total_possible and student_id:
-            parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned})
+        total_earned, total_possible, student_ids = find_grade_in_readme(readme_content, full_repo_url, repo_type)
+        if total_earned and total_possible and len(student_ids) > 0:
+            for student_id in student_ids:
+                parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned})
+
             print(f"[SUCCESS] Parsed grade: {total_earned}/{total_possible} for {full_repo_url}.")
         else:
             print(f"[ERROR] Incomplete grade data for {full_repo_url}.")
@@ -129,11 +137,11 @@ def process_single_repo(repo, base_url, parsed_grades):
     subprocess.run(["rm", "-rf", repo_path], stdout=subprocess.DEVNULL)
 
 
-def parallelize_grade_parsing(repo_names, base_url):
+def parallelize_grade_parsing(repo_names, base_url, repo_type):
     """Parse grades from repositories in parallel."""
     parsed_grades = []
     with ThreadPoolExecutor() as executor:
-        futures = [executor.submit(process_single_repo, repo, base_url, parsed_grades) for repo in repo_names]
+        futures = [executor.submit(process_single_repo, repo, base_url, parsed_grades, repo_type) for repo in repo_names]
         for future in futures:
             try:
                 future.result()
@@ -168,13 +176,24 @@ def main():
     confirm_repo_names_are_ok(repo_names)
 
     base_url = f"https://github.com/{org_name}/"
-    parsed_grades = parallelize_grade_parsing(repo_names, base_url)
+    parsed_grades = parallelize_grade_parsing(repo_names, base_url, group_or_individual)
 
     output_path = f"./results/module-{module_number}-{group_or_individual}.csv"
     write_to_csv(output_path, parsed_grades, ["STUDENT_ID", "GRADE"])
 
-    success_count = len(parsed_grades)
+    def count_errors():
+        error_count = 0
+        lines_to_skip = 1  # Skip the header line
+        with open(error_log_path, 'r') as infile:
+            for i, line in enumerate(infile):
+                if i < lines_to_skip:
+                    continue
+                error_count += 1
+        print(f"  Failed to process: {error_count}")
+        return error_count
+
     total_count = len(repo_names)
+    success_count = total_count - count_errors()
     print(f"\nProcessing complete:")
     print(f"  Total repos: {total_count}")
     print(f"  Successfully processed: {success_count}")
