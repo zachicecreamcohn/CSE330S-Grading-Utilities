@@ -127,7 +127,7 @@ def process_single_repo(repo, base_url, parsed_grades, module_type: ModuleType):
         with open(readme_path, "r") as readme_file:
             readme_content = readme_file.read()
 
-        # TODO: make sure this works
+        # Parse readme grading template for grade info and add to resulting grades
         total_earned, total_possible, student_ids = find_grade_in_readme(readme_content, full_repo_url, module_type)
         if total_earned and total_possible and len(student_ids) > 0:
             for student_id in student_ids:
@@ -202,7 +202,7 @@ def main():
     total_count = len(repo_names)
     success_count = total_count - count_errors()
     print(f"\nProcessing complete:")
-    print(f"  Total repos: {total_count}")
+    print(f"  Total student grades: {total_count}")
     print(f"  Successfully processed: {success_count}")
     print(f"  Failed to process: {total_count - success_count}")
     print(f"  Success rate: {success_count / total_count:.2%}")
