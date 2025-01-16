@@ -3,7 +3,7 @@
 ## File conversion
 
 I decided to make it so that the .txt file is converted to a json file (instead of a csv) to be used in the grading script.
-You will find `./util/convertMappingToJson.py` which will handle the file conversion.
+You will find `./util/mappings_to_json.py` which will handle the file conversion.
 
 **_Important:_** This is built such that the file structure is **Critical**. Any text files that come from Professor Sproull with the matching grader to repo name must be found in the directory/file format of `./util/text-files/module-<module_number>.txt`. Schematically, the files should follow an almost identical structure to:
 
@@ -24,12 +24,12 @@ Other Grades...
 
 ```bash
 ## If you are in project root:
-cd ./util && python3 convertMappingToJson.py <module_number> && cd ..
+cd ./util && python3 mappings_to_json.py <module_number> && cd ..
 ## If you are in ./util, just run:
-python3 convertMappingToJson.py <module_number>
+python3 mappings_to_json.py <module_number>
 ```
 
-The `module_number` param will be whatever the file is named. For example: Lets say I have a file at `./util/text-files/module-1.txt`, then I would run `python3 ./util/convertMappingToJson.py 1` to convert the file.
+The `module_number` param will be whatever the file is named. For example: Lets say I have a file at `./util/text-files/module-1.txt`, then I would run `python3 ./util/mappings_to_json.py 1` to convert the file.
 
 Once this is complete, you should see an equivalent filename under `./util/json-files/module-<module_number>.json` that follows the general schema of:
 
