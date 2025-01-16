@@ -34,9 +34,8 @@ def confirm_repo_names_are_ok(repo_names):
 
 def find_grade_in_readme(readme_content):
     """Extract grade details and student ID from the README content."""
-    total_earned, total_possible, student_id = None, None, None
+    total_earned, total_possible, student_ids = None, None, set()
     lines = readme_content.splitlines()
-
     for i, line in enumerate(lines):
         if total_earned is None and "Total Earned" in line and i + 2 < len(lines):
             data_line = lines[i + 2].split('|')
@@ -44,15 +43,13 @@ def find_grade_in_readme(readme_content):
                 total_earned = data_line[1].strip()
                 total_possible = data_line[2].strip()
 
-        if student_id is None:
-            match = re.search(r"\b\d{6}\b", line)
-            if match:
-                student_id = match.group()
+        matches = re.findall(r"\b\d{6}\b", line)
+        student_ids.update(matches)
 
-        if total_earned and total_possible and student_id:
+        if total_earned and total_possible and student_ids:
             break
 
-    return total_earned, total_possible, student_id
+    return total_earned, total_possible, student_ids
 
 
 def process_single_repo(repo, base_url, parsed_grades):
@@ -80,9 +77,11 @@ def process_single_repo(repo, base_url, parsed_grades):
         with open(readme_path, "r") as readme_file:
             readme_content = readme_file.read()
 
-        total_earned, total_possible, student_id = find_grade_in_readme(readme_content)
-        if total_earned and total_possible and student_id:
-            parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned})
+        total_earned, total_possible, student_ids = find_grade_in_readme(readme_content)
+        if total_earned and total_possible and student_ids:
+            parsed_grades.append({"STUDENT_ID": list(student_ids)[0], "GRADE": total_earned})
+            if len(student_ids) > 1:
+                parsed_grades.append({"STUDENT_ID": list(student_ids)[1], "GRADE": total_earned})
             print(f"[SUCCESS] Parsed grade: {total_earned}/{total_possible} for {full_repo_url}.")
         else:
             print(f"[ERROR] Incomplete grade data for {full_repo_url}.")
@@ -136,6 +135,7 @@ def main():
 
     output_path = f"./results/module-{module_number}-{group_or_individual}.csv"
     write_to_csv(output_path, parsed_grades, ["STUDENT_ID", "GRADE"])
+
 
     success_count = len(parsed_grades)
     total_count = len(repo_names)
