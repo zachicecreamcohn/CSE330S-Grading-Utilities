@@ -9,6 +9,7 @@ grades_to_canvas/.DS_Store
 .DS_Store
 M4-Autograder/.env
 # Repo Scraper Ignore
-repo-grade-scraper/grades
 repo-grade-scraper/temporary-repo-directory
-repo-grade-scraper/util/json-files
+repo-grade-scraper/results
+# Grading Template to Repo Script Ignore
+grading-template-to-repos/temporary-repo-directory
