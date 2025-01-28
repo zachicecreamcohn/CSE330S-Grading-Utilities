@@ -28,6 +28,7 @@ def parse_repo_names_from_txt(module_number, group_or_individual):
 def confirm_repo_names_are_ok(repo_names):
     """Prompt user confirmation for the parsed repository names."""
     print(repo_names)
+    print(f"Found {len(repo_names)} repositories.")
     confirmation = input("Do these look like the correct repos? (yes/no): ").strip().lower()
     if confirmation not in {"yes", "y"}:
         print(f"Exiting: Confirmation failed ({confirmation}).")
