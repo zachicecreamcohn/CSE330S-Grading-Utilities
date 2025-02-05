@@ -191,6 +191,8 @@ def main():
     def count_errors():
         error_count = 0
         lines_to_skip = 1  # Skip the header line
+        if not os.path.exists(error_log_path):
+            return error_count
         with open(error_log_path, 'r') as infile:
             for i, line in enumerate(infile):
                 if i < lines_to_skip:
