@@ -28,6 +28,7 @@ def parse_repo_names_from_txt(module_number, group_or_individual):
 def confirm_repo_names_are_ok(repo_names):
     """Prompt user confirmation for the parsed repository names."""
     print(repo_names)
+    print(f"Found {len(repo_names)} repositories.")
     confirmation = input("Do these look like the correct repos? (yes/no): ").strip().lower()
     if confirmation not in {"yes", "y"}:
         print(f"Exiting: Confirmation failed ({confirmation}).")
@@ -49,14 +50,24 @@ def get_markdown_content_to_push_to_readme(module_number, group_or_individual):
 
     return template_text
 
+def check_for_grading_branch(repo_path):
+    """Check if the grading branch exists in the repository."""
+    result = subprocess.run(
+        ["git", "-C", repo_path, "show-ref", "--verify", "--quiet", "refs/heads/grading"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+    return result.returncode == 0
 
 def process_single_repo(repo, base_url, content_to_push):
     """Process a single repository by cloning, updating, and pushing changes."""
     full_repo_url = f"{base_url}{repo}"
     repo_path = f"./temporary-repo-directory/{repo}"
 
-    # Clone the repository
-    clone_result = subprocess.run(
+    if (check_for_grading_branch(repo_path)):
+        print(f"[WARNING] Grading branch already exists in {repo}. Skipping {full_repo_url}...")
+        return
+
+    subprocess.run(
         ["git", "clone", full_repo_url, repo_path],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
