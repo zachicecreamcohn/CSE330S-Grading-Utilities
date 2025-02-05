@@ -15,7 +15,7 @@
 | 0      | 2        | Safe from SQL injection attacks                                                  |          |
 | 0      | 3        | Site follows FIEO                                                                |          |
 | 0      | 2        | All pages pass the W3C validator                                                 |          |
-| 0      | 5        | CSRF tokens are passed when creating, editing, and deleting comments/stories     |          |
+| 0      | 5        | CSRF tokens are passed when creating, editing, and deleting comments/stories     |          | <!-- -2pts for each instance that CSRF tokens are implemented-->
 | 0      | 4        | Site is intuitive to use and navigate                                            |          |
 | 0      | 1        | Site is visually appealing                                                       |          |
 

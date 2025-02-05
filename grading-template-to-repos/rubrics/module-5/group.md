@@ -6,7 +6,7 @@
 | 0      | 2        | Events have a title, date, and time                                                                             |          |
 | 0      | 8        | Users can log into the site and they cannot view or manipulate events associated with other users               |          |
 | 0      | 10       | All actions are performed over AJAX, without ever needing to reload the page                                    |          |
-| 0      | 2        | Code best practices (formatting, commenting, readability) and use of `fetch` and no `var`                       |          |
+| 0      | 2        | Code best practices (formatting, commenting, readability) and use of `fetch` and no `var`                       |          | <!-- 0 points if they don't use fetch or if they use "var" anywhere other than the provided calendar var-->
 | 0      | 2        | If storing passwords, they are stored salted and encrypted                                                      |          |
 | 0      | 3        | All AJAX requests that contain sensitive info or modify something on the server are performed via POST, not GET |          |
 | 0      | 3        | Safe from XSS attacks (all content is escaped on output)                                                        |          |
@@ -14,10 +14,14 @@
 | 0      | 3        | CSRF token implemented OR User-Agent implementation                                                             |          |
 | 0      | 3        | Session cookie is HTTP-only                                                                                     |          |
 | 0      | 2        | Page passes W3C validator                                                                                       |          |
-| 0      | 4        | Site is intuitive and easy to use/navigate                                                                      |          |
+| 0      | 4        | Site is intuitive and easy to use/navigate                                                                      |          | <!-- -2pts if UI thinks they're logged out on refresh -->
 | 0      | 1        | Site is visually appealing                                                                                      |          |
 
 ## Creative Portion (15 possible)
+<!--- 0pts if no description in README-->
+<!--- tags that can be toggled to hide/show events-->
+<!--- users can share calendar with other users-->
+<!--- Users can create group events that display on multiple users calendars-->
 
 | Earned | Feature | Feedback |
 | ------ | ------- | -------- |
