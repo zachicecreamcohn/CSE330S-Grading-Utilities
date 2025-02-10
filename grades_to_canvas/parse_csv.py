@@ -15,11 +15,15 @@ class CSVParser:
         if args.csv_file is None or args.csv_file == "":
             exit_with_error("csv file not specified")
 
+        if args.input_type is None or args.input_type == "":
+            exit_with_error("input type not specified. Must be either 'google_sheets' or 'scraper'")
+
         # now, verify that the csv file exists and is a valid csv file
         if not args.csv_file.endswith(".csv") or not os.path.exists(args.csv_file):
             exit_with_error("Invalid csv file: " + args.csv_file)
 
         self.path = args.csv_file
+        self.input_type = args.input_type
 
         try:
             self.csv_file = open(self.path, "r+")
@@ -31,45 +35,57 @@ class CSVParser:
         self.verbose = args.verbose
         self.student_grades = {}  # will be a dictionary of the form {student_id: grade}
 
-    # check that the csv file has a GRADE column
-    def verify_csv(self):
-        # check that the csv file has a GRADE column
-        if "GRADE" not in self.csv_reader.fieldnames:
-            exit_with_error("csv file must have a GRADE column")
+    def verify_csv(self, input_type="google_sheets"): # either "google_sheets" or "scraper"
+        if input_type == "google_sheets":
+            # check that the csv file has a GRADE column
+            if "GRADE" not in self.csv_reader.fieldnames:
+                exit_with_error("csv file must have a GRADE column")
 
-        # check that each row has a grade in the GRADE column (and that the grade is a number)
-        for row_dict in self.csv_reader:
+            # check that each row has a grade in the GRADE column (and that the grade is a number)
+            for row_dict in self.csv_reader:
 
-            if row_dict["GRADE"] == "" or row_dict["GRADE"] is None:
-                self.problem_rows.append(row_dict)
-                continue
+                if row_dict["GRADE"] == "" or row_dict["GRADE"] is None:
+                    self.problem_rows.append(row_dict)
+                    continue
 
-            try:
-                float(row_dict["GRADE"])
-            except ValueError:
-                self.problem_rows.append(row_dict)
+                try:
+                    float(row_dict["GRADE"])
+                except ValueError:
+                    self.problem_rows.append(row_dict)
+        elif input_type == "scraper":
+            # check that csv has two columns only (STUDENT_ID, GRADE)
+            if len(self.csv_reader.fieldnames) != 2:
+                exit_with_error("csv file must have exactly two columns: STUDENT_ID and GRADE")
+            if "STUDENT_ID" not in self.csv_reader.fieldnames or "GRADE" not in self.csv_reader.fieldnames:
+                exit_with_error("csv file must have columns STUDENT_ID and GRADE")
 
         self.csv_file.seek(0)  # reset the csv file reader to the beginning of the file
 
     # get the student grades from the csv file
     def parse(self):
-        # check that the csv file has a GRADE column
         self.verify_csv()
+        if self.input_type == "google_sheets":
 
-        for column_name in self.find_student_id_columns():
+            for column_name in self.find_student_id_columns():
+                for row_dict in self.csv_reader:
+
+                    if row_dict[column_name] == "" or row_dict in self.problem_rows or row_dict["GRADE"] == "GRADE":
+                        continue
+
+                    student_id = row_dict[column_name]
+
+                    if student_id == "000000" or student_id == 000000:
+                        self.problem_rows.append(row_dict)
+                    grade = row_dict["GRADE"]
+
+                    self.student_grades[student_id] = grade
+                self.csv_file.seek(0)
+        else:
             for row_dict in self.csv_reader:
-
-                if row_dict[column_name] == "" or row_dict in self.problem_rows or row_dict["GRADE"] == "GRADE":
-                    continue
-
-                student_id = row_dict[column_name]
-
-                if student_id == "000000" or student_id == 000000:
-                    self.problem_rows.append(row_dict)
+                student_id = row_dict["STUDENT_ID"]
                 grade = row_dict["GRADE"]
 
                 self.student_grades[student_id] = grade
-            self.csv_file.seek(0)
 
         return self.student_grades
 

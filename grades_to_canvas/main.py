@@ -11,14 +11,14 @@ from canvas import CanvasWriter
 
 # todo: use colorama for colored output
 # todo: use canvasapi to interact with canvas
-# todo: go through and add output if verbose is true to everything
 
 def setup_argparse():
     parser = argparse.ArgumentParser(description="Transfer grades from google sheets csv to canvas")
     parser.add_argument("csv_file", help="csv file to read grades from")
     parser.add_argument("canvas_template_file", help="csv exported from canvas gradebook")
+    parser.add_argument("input_type", help="input type. Must be either 'google_sheets' or 'scraper'", choices=["google_sheets", "scraper"], default="scraper")
+    parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
 
-    parser.add_argument("-v", "--verbose", action="store_true", help="Print verbose output")
     return parser.parse_args()
 
 
