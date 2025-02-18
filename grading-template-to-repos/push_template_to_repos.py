@@ -63,7 +63,7 @@ def process_single_repo(repo, base_url, content_to_push):
     full_repo_url = f"{base_url}{repo}"
     repo_path = f"./temporary-repo-directory/{repo}"
 
-    if (not check_for_grading_branch(repo_path)):
+    if (check_for_grading_branch(repo_path)):
         print(f"[WARNING] Grading branch already exists in {repo}. Skipping {full_repo_url}...")
         return
 
