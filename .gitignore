@@ -14,3 +14,6 @@ repo-grade-scraper/results
 repo-grade-scraper/error_log*
 # Grading Template to Repo Script Ignore
 grading-template-to-repos/temporary-repo-directory
+grades_to_canvas/graded.csv
+repo-grade-scraper/text-grader-mappings/module-2-group.txt
+repo-grade-scraper/text-grader-mappings/module-2-individual.txt

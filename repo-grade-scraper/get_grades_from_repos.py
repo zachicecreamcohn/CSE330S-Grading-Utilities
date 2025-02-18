@@ -127,11 +127,10 @@ def process_single_repo(repo, base_url, parsed_grades, module_type: ModuleType):
         with open(readme_path, "r") as readme_file:
             readme_content = readme_file.read()
 
-        # Parse readme grading template for grade info and add to resulting grades
         total_earned, total_possible, student_ids = find_grade_in_readme(readme_content, full_repo_url, module_type)
         if total_earned and total_possible and len(student_ids) > 0:
             for student_id in student_ids:
-                parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned})
+                parsed_grades.append({"STUDENT_ID": student_id, "GRADE": total_earned, "REPO_URL": full_repo_url})
             print(f"[SUCCESS] Parsed grade: {total_earned}/{total_possible} for {full_repo_url}.")
         else:
             print(f"[ERROR] Incomplete grade data for {full_repo_url}.")
@@ -158,11 +157,12 @@ def parallelize_grade_parsing(repo_names, base_url, module_type):
     return parsed_grades
 
 
-def write_to_csv(file_path, data, headers):
+def write_to_csv(file_path, data):
     """Write parsed grades to a CSV file."""
+
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, mode='w', newline='', encoding='utf-8') as csv_file:
-        writer = csv.DictWriter(csv_file, fieldnames=headers)
+        writer = csv.DictWriter(csv_file, fieldnames=["STUDENT_ID", "GRADE", "REPO_URL"])
         writer.writeheader()
         writer.writerows(data)
 
@@ -186,7 +186,7 @@ def main():
     parsed_grades = parallelize_grade_parsing(repo_names, base_url, module_type)
 
     output_path = f"./results/module-{module_number}-{module_type.value}.csv"
-    write_to_csv(output_path, parsed_grades, ["STUDENT_ID", "GRADE"])
+    write_to_csv(output_path, parsed_grades)
 
     def count_errors():
         error_count = 0
