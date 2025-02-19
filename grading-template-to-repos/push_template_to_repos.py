@@ -50,7 +50,7 @@ def get_markdown_content_to_push_to_readme(module_number, group_or_individual):
 
     return template_text
 
-def check_for_grading_branch(repo_path):
+def grading_branch_exists(repo_path):
     """Check if the grading branch exists in the repository."""
     result = subprocess.run(
         ["git", "-C", repo_path, "show-ref", "--verify", "--quiet", "refs/heads/grading"],
@@ -63,7 +63,7 @@ def process_single_repo(repo, base_url, content_to_push):
     full_repo_url = f"{base_url}{repo}"
     repo_path = f"./temporary-repo-directory/{repo}"
 
-    if (check_for_grading_branch(repo_path)):
+    if (grading_branch_exists(repo_path)):
         print(f"[WARNING] Grading branch already exists in {repo}. Skipping {full_repo_url}...")
         return
 
