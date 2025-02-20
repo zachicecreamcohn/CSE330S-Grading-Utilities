@@ -28,7 +28,7 @@ class Regex2Grader(BaseRegexGrader):
         good_sample = "The gooey peanut butter and jelly sandwich was beautiful"
         if len(re.findall(self.regex, good_sample)) < 2:
             self.feedback += "\nregex does not match multiple words containg at least three consecutive vowels when it should."
-            self.points_deducted += 3
+            self.points_deducted += 2
 
     def check_that_it_matches_entire_word(self):
         good_sample = "gooey"
@@ -40,7 +40,7 @@ class Regex2Grader(BaseRegexGrader):
             or regex_result.group() == "eey"
         ):
             self.feedback += "\nregex matches the consecutive vowel substring of the word when it should match the entire word."
-            self.points_deducted += 3
+            self.points_deducted += 2
 
     def grade(self):
         """
