@@ -11,9 +11,6 @@ def setup():
     parser.add_argument(
         "github_org", help="github organization name (e.g., 'cse330-spring-2025')"
     )
-    parser.add_argument(
-        "repo_dir", help="directory to clone repos into", default="m4_grading_repos"
-    )
     return parser.parse_args()
 
 
