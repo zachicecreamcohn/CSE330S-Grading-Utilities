@@ -17,9 +17,11 @@ def setup():
     return parser.parse_args()
 
 
-def ensure_clean_results_file():
+def remove_old_files():
     if os.path.exists("m4_autograder_results.csv"):
         os.remove("m4_autograder_results.csv")
+    if os.path.exists("m4_autograder_errors.csv"):
+        os.remove("m4_autograder_errors.csv")
 
 
 def get_repo_URLs(repos_txt, github_org):
@@ -31,13 +33,25 @@ def get_repo_URLs(repos_txt, github_org):
         ]
 
 
+def write_to_error_log(repo_link, error_message):
+    if not os.path.exists("m4_autograder_errors.csv"):
+        with open("m4_autograder_errors.csv", "w") as file:
+            file.write("Repo Link, Error Message\n")
+
+    with open("m4_autograder_errors.csv", "a") as file:
+        file.write(f"{repo_link}, {error_message}\n")
+
+
 def main():
     args = setup()
-    ensure_clean_results_file()
+    remove_old_files()
     repo_URLs = get_repo_URLs(args.repos_txt, args.github_org)
     for repo_URL in repo_URLs:
-        grader = MainGrader(repo_URL)
-        grader.main()
+        try:
+            grader = MainGrader(repo_URL)
+            grader.main()
+        except Exception as e:
+            write_to_error_log(repo_URL, str(e))
 
 
 if __name__ == "__main__":
