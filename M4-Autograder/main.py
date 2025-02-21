@@ -1,4 +1,5 @@
 import argparse
+import os
 from graders.main_grader import MainGrader
 
 
@@ -16,6 +17,11 @@ def setup():
     return parser.parse_args()
 
 
+def ensure_clean_results_file():
+    if os.path.exists("m4_autograder_results.csv"):
+        os.remove("m4_autograder_results.csv")
+
+
 def get_repo_URLs(repos_txt, github_org):
     with open(repos_txt, "r") as file:
         return [
@@ -27,6 +33,7 @@ def get_repo_URLs(repos_txt, github_org):
 
 def main():
     args = setup()
+    ensure_clean_results_file()
     repo_URLs = get_repo_URLs(args.repos_txt, args.github_org)
     for repo_URL in repo_URLs:
         grader = MainGrader(repo_URL)
