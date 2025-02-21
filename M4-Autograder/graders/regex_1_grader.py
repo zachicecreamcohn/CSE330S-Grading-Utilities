@@ -1,17 +1,19 @@
 import re
-from base_regex_grader import BaseRegexGrader
+from graders.base_regex_grader import BaseRegexGrader
 
 
 class Regex1Grader(BaseRegexGrader):
     def check_against_hello_world(self):
         good_sample = "hello world"
         if not re.match(self.regex, good_sample):
-            self.feedback += "\nregex does not match 'hello world' when it should."
+            self.feedback += (
+                "<li>regex does not match 'hello world' when it should.</li>"
+            )
 
     def check_against_hello_frank(self):
         bad_sample = "hello frank"
         if re.match(self.regex, bad_sample):
-            self.feedback += "\nregex matches 'hello frank' when it shouldn't."
+            self.feedback += "<li>regex matches 'hello frank' when it shouldn't.</li>"
             self.points_deducted += 5
 
     def grade(self):
@@ -20,5 +22,3 @@ class Regex1Grader(BaseRegexGrader):
         """
         self.check_against_hello_world()
         self.check_against_hello_frank()
-
-        return self.points_possible, self.points_deducted
