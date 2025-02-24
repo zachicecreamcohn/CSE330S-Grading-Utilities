@@ -3,11 +3,11 @@
 ## Usage
 
 ```
-python main.py <github_org_name> <path_to_repo_names_txt>
+python main.py <github_org_name> <name_of_repo_template>
 ```
 
 - The `github_org_name` is something like cse330-spring-2025
-- The `path_to_repo_names_txt` is the path to a text file that contains the names of the repos (e.g., module4-zachicecreamcohn) to grade, one per line
+-  `name_of_repo_template` is the name of the repo from which every repo for the given assignment was forked. Each assignment (e.g., module 2 group) has its own template repo.
 
 ## Output
 Results are written to a CSV file `m4_autograder_results.csv` containing Student ID, Grade, and Repo Link. If a student ID can't be found, it will default to `000000`

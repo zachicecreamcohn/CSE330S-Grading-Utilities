@@ -1,4 +1,6 @@
 import argparse
+import json
+import subprocess
 import os
 from graders.main_grader import MainGrader
 
@@ -11,6 +13,9 @@ def setup():
     parser.add_argument(
         "github_org", help="github organization name (e.g., 'cse330-spring-2025')"
     )
+    parser.add_argument(
+        "assignment_repo_template", help="Template repo name for assignment."
+    )
     return parser.parse_args()
 
 
@@ -19,15 +24,6 @@ def remove_old_files():
         os.remove("m4_autograder_results.csv")
     if os.path.exists("m4_autograder_errors.csv"):
         os.remove("m4_autograder_errors.csv")
-
-
-def get_repo_URLs(repos_txt, github_org):
-    with open(repos_txt, "r") as file:
-        return [
-            f"https://github.com/{github_org}/{repo_name}.git"
-            for repo_name in file.read().split("\n")
-            if repo_name
-        ]
 
 
 def write_to_error_log(repo_link, error_message):
@@ -39,10 +35,33 @@ def write_to_error_log(repo_link, error_message):
         file.write(f"{repo_link}, {error_message}\n")
 
 
+def get_assignment_repos(template_repo_name, github_org):
+    response = subprocess.run(
+        ["gh", "api", f"repos/{github_org}/{template_repo_name}/forks", "--paginate"],
+        capture_output=True,
+        text=True,
+    )
+
+    response_json = json.loads(response.stdout)
+
+    if type(response_json) != list:
+        if response_json["message"] == "Not Found":
+            print("Repo not found")
+            return []
+
+    repo_urls = []
+
+    for repo in response_json:
+        print(repo["html_url"])
+        repo_urls.append(repo["html_url"])
+
+    return repo_urls
+
+
 def main():
     args = setup()
     remove_old_files()
-    repo_URLs = get_repo_URLs(args.repos_txt, args.github_org)
+    repo_URLs = get_assignment_repos(args.assignment_repo_template, args.github_org)
     for repo_URL in repo_URLs:
         try:
             grader = MainGrader(repo_URL)
