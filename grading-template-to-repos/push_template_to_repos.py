@@ -2,34 +2,39 @@ import argparse
 import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
+import json
 
 
-def parse_repo_names_from_txt(module_number, group_or_individual):
-    """Parse repository names from the given text file."""
-    file_type = "individual" if group_or_individual == "individual" else "group"
-    repo_mapping_file_path = f"./text-grader-mappings/module-{module_number}-{file_type}.txt"
+def get_assignment_repos(template_repo_name, github_org):
+    response = subprocess.run(
+        ["gh", "api", f"repos/{github_org}/{template_repo_name}/forks", "--paginate"],
+        capture_output=True,
+        text=True,
+    )
 
-    repo_names = []
-    try:
-        with open(repo_mapping_file_path, 'r') as infile:
-            for line in infile:
-                parts = line.strip().split(':')
-                if len(parts) > 2:
-                    repo_names.append(parts[1])  # Extract the repo name
-                else:
-                    print(f"[WARNING] Skipping malformed line: {line}")
-    except FileNotFoundError:
-        print(f"[ERROR] File not found: {repo_mapping_file_path}")
-        exit(1)
+    response_json = json.loads(response.stdout)
 
-    return repo_names
+    if type(response_json) != list:
+        if response_json["message"] == "Not Found":
+            print("Repo not found")
+            return []
+
+    repo_urls = []
+
+    for repo in response_json:
+        print(repo["html_url"])
+        repo_urls.append(repo["html_url"])
+
+    return repo_urls
 
 
-def confirm_repo_names_are_ok(repo_names):
+def confirm_repos_are_ok(repos):
     """Prompt user confirmation for the parsed repository names."""
-    print(repo_names)
-    print(f"Found {len(repo_names)} repositories.")
-    confirmation = input("Do these look like the correct repos? (yes/no): ").strip().lower()
+    print(repos)
+    print(f"Found {len(repos)} repositories.")
+    confirmation = (
+        input("Do these look like the correct repos? (yes/no): ").strip().lower()
+    )
     if confirmation not in {"yes", "y"}:
         print(f"Exiting: Confirmation failed ({confirmation}).")
         exit()
@@ -42,38 +47,53 @@ def get_markdown_content_to_push_to_readme(module_number, group_or_individual):
 
     template_text = "# Grading\n\n"
     try:
-        with open(markdown_template_file_path, 'r') as infile:
+        with open(markdown_template_file_path, "r") as infile:
             template_text += "".join(line.strip() + "\n" for line in infile)
     except FileNotFoundError:
-        print(f"[ERROR] Markdown template file not found: {markdown_template_file_path}")
+        print(
+            f"[ERROR] Markdown template file not found: {markdown_template_file_path}"
+        )
         exit(1)
 
     return template_text
 
+
 def grading_branch_exists(repo_path):
     """Check if the grading branch exists in the repository."""
     result = subprocess.run(
-        ["git", "-C", repo_path, "show-ref", "--verify", "--quiet", "refs/heads/grading"],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        [
+            "git",
+            "-C",
+            repo_path,
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/grading",
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     return result.returncode == 0
 
-def process_single_repo(repo, base_url, content_to_push):
-    """Process a single repository by cloning, updating, and pushing changes."""
-    full_repo_url = f"{base_url}{repo}"
-    repo_path = f"./temporary-repo-directory/{repo}"
 
-    if (grading_branch_exists(repo_path)):
-        print(f"[WARNING] Grading branch already exists in {repo}. Skipping {full_repo_url}...")
+def process_single_repo(repo_url, content_to_push):
+    """Process a single repository by cloning, updating, and pushing changes."""
+    repo_path = f"./temporary-repo-directory/{repo_url}"
+
+    if grading_branch_exists(repo_path):
+        print(
+            f"[WARNING] Grading branch already exists in {repo_url}. Skipping {full_repo_url}..."
+        )
         return
 
     subprocess.run(
-        ["git", "clone", full_repo_url, repo_path],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        ["git", "clone", repo_url, repo_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
     if not os.path.exists(repo_path):
-        print(f"[ERROR] Failed to clone {repo}. Skipping {full_repo_url}...")
+        print(f"[ERROR] Failed to clone {repo_url}. Skipping {repo_url}...")
         return
 
     branch_name = "grading"
@@ -81,12 +101,14 @@ def process_single_repo(repo, base_url, content_to_push):
     # Check out or create the grading branch
     result = subprocess.run(
         ["git", "-C", repo_path, "checkout", branch_name],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     if result.returncode != 0:
         subprocess.run(
             ["git", "-C", repo_path, "checkout", "-b", branch_name],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
 
     # Add content to README.md
@@ -95,53 +117,88 @@ def process_single_repo(repo, base_url, content_to_push):
         with open(readme_path, "a") as readme_file:
             readme_file.write("\n" + content_to_push)
     except Exception as e:
-        print(f"[ERROR] Failed to write to README.md for {repo}: {e}")
+        print(f"[ERROR] Failed to write to README.md for {repo_url}: {e}")
         return
 
     # Commit and push changes
-    subprocess.run(["git", "-C", repo_path, "add", "README.md"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.run(["git", "-C", repo_path, "commit", "-m", "Add grading template to grading branch"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(
+        ["git", "-C", repo_path, "add", "README.md"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            repo_path,
+            "commit",
+            "-m",
+            "Add grading template to grading branch",
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
     push_result = subprocess.run(
         ["git", "-C", repo_path, "push", "-u", "origin", branch_name],
-        stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
-        text=True
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True,
     )
 
     # Clean up the cloned repository
     subprocess.run(["rm", "-rf", repo_path], stdout=subprocess.DEVNULL)
 
     if push_result.returncode == 0:
-        print(f"[SUCCESS] Grading template pushed to {full_repo_url} on branch: {branch_name}")
+        print(
+            f"[SUCCESS] Grading template pushed to {repo_url} on branch: {branch_name}"
+        )
     else:
         error_message = push_result.stderr.strip()
-        print(f"[FAILURE] Failed to push grading template to {full_repo_url} on branch: {branch_name}. Error: {error_message}")
+        print(
+            f"[FAILURE] Failed to push grading template to {repo_url} on branch: {branch_name}. Error: {error_message}"
+        )
 
 
-def push_template_to_repos_on_grading_branch(repo_names, org_name, content_to_push):
+def push_template_to_repos_on_grading_branch(repo_urls, content_to_push):
     """Push templates to all repositories in parallel."""
-    base_url = f"https://github.com/{org_name}/"
     with ThreadPoolExecutor() as executor:
-        executor.map(lambda repo: process_single_repo(repo, base_url, content_to_push), repo_names)
+        executor.map(
+            lambda repo: process_single_repo(repo, content_to_push),
+            repo_urls,
+        )
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Push grading templates to GitHub repositories.")
-    parser.add_argument('module_number', help="Module number of the text file (e.g., '1', '2').")
-    parser.add_argument('group_or_individual', help="Repository type: 'group' or 'individual'.")
-    parser.add_argument('org_name', help="GitHub organization name.")
+    parser = argparse.ArgumentParser(
+        description="Push grading templates to GitHub repositories."
+    )
+    parser.add_argument(
+        "module_number", help="Module number of the text file (e.g., '1', '2')."
+    )
+    parser.add_argument(
+        "group_or_individual", help="Repository type: 'group' or 'individual'."
+    )
+    parser.add_argument("org_name", help="GitHub organization name.")
+    parser.add_argument(
+        "assignment_repo_template", help="Template repo name for assignment."
+    )
     args = parser.parse_args()
 
     module_number = args.module_number
     group_or_individual = args.group_or_individual
     org_name = args.org_name
 
-    print(f"Preparing to push grading templates for module {module_number} ({group_or_individual}) repositories.")
-    repo_names = parse_repo_names_from_txt(module_number, group_or_individual)
-    confirm_repo_names_are_ok(repo_names)
+    print(
+        f"Preparing to push grading templates for module {module_number} ({group_or_individual}) repositories."
+    )
+    repo_urls = get_assignment_repos(args.assignment_repo_template, org_name)
+    confirm_repos_are_ok(repo_urls)
 
-    content_to_push = get_markdown_content_to_push_to_readme(module_number, group_or_individual)
-    push_template_to_repos_on_grading_branch(repo_names, org_name, content_to_push)
+    content_to_push = get_markdown_content_to_push_to_readme(
+        module_number, group_or_individual
+    )
+    push_template_to_repos_on_grading_branch(repo_urls, content_to_push)
 
 
 if __name__ == "__main__":
