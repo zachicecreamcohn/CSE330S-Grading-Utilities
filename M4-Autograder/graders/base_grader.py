@@ -13,9 +13,7 @@ class BaseGrader:
         pass
 
     def compute_points(self):
-        if self.points_deducted < 0:
-            self.points_deducted = 0
-        return self.points_possible - self.points_deducted
+        return self.points_possible - max(0, self.points_deducted)
 
     def get_points_deducted(self):
         return self.points_deducted

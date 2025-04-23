@@ -9,7 +9,7 @@ from graders.regex_1_grader import Regex1Grader
 
 
 class MainGrader(BaseGrader):
-    def __init__(self, repo_link):
+    def __init__(self, repo_link, repo_location=None):
         super().__init__()
         self.points_possible = 50
         self.repo_link = repo_link
@@ -18,7 +18,12 @@ class MainGrader(BaseGrader):
         self.regex3_path = ""
         self.baseball_path = ""
         self.repo_dir = ""
-        self.clone_repo()
+        if not repo_location:
+            self.clone_repo()
+        else:
+            self.repo_dir = repo_location
+
+        self.checkout_grading()
 
     def record_problematic_repo(self, error_message):
         if not os.path.exists("m4_autograder_errors.csv"):
@@ -33,6 +38,8 @@ class MainGrader(BaseGrader):
     def clone_repo(self):
         self.repo_dir = self.repo_link.split("/")[-1]
         subprocess.run(["git", "clone", self.repo_link, self.repo_dir])
+
+    def checkout_grading(self):
         subprocess.run(
             ["git", "-C", self.repo_dir, "checkout", "-b", "grading"],
             stdout=subprocess.DEVNULL,
@@ -45,6 +52,7 @@ class MainGrader(BaseGrader):
         self.baseball_path = self.get_baseball_path()
 
     def recursive_search(self, file_pattern):
+
         pattern = re.compile(file_pattern)
         for root, _, files in os.walk(self.repo_dir):
             for file in files:

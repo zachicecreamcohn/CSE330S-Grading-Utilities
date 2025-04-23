@@ -26,11 +26,6 @@ class BaseballGrader(BaseGrader):
             with open(self.input_file_path, "r") as file:
                 self.baseball_file_contents = file.read().splitlines()
 
-        def check_if_file_imports_re(self):
-            if not any("import re" in line for line in self.baseball_file_contents):
-                self.feedback += "<li>File does not import re module.</li>"
-                self.points_deducted += 8
-
         def check_if_re_is_used(self):
             # NOTE: This is called within check_if_string_methods_are_used and so should not be called separately
 
@@ -40,7 +35,7 @@ class BaseballGrader(BaseGrader):
 
         def check_if_string_methods_are_used(self):
             split_used = False
-            if any("str.split" in line for line in self.baseball_file_contents):
+            if any(".split" in line for line in self.baseball_file_contents):
                 split_used = True
 
             uses_regex = self.check_if_re_is_used()
@@ -49,7 +44,6 @@ class BaseballGrader(BaseGrader):
                 self.points_deducted += 4
 
         def grade(self):
-            self.check_if_file_imports_re()
             self.check_if_string_methods_are_used()
 
     class UsageMessageGrader(BaseGrader):
