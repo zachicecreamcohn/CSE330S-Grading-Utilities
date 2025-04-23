@@ -94,20 +94,9 @@ def confirm_repo_names_are_ok(repo_names):
         exit()
 
 
-def find_grade_in_readme(readme_content, repo_url, module_type: ModuleType):
-    """Extract grade details and student ID from the README content."""
-    total_earned, total_possible, student_ids = (
-        None,
-        None,
-        set(),
-    )  # Set to prevent duplicate student_id entries
-    lines = readme_content.splitlines()
-    for i, line in enumerate(lines):
-        if total_earned is None and "Total Earned" in line and i + 2 < len(lines):
-            data_line = lines[i + 2].split("|")
-            if len(data_line) >= 3:
-                total_earned = data_line[1].strip()
-                total_possible = data_line[2].strip()
+def find_grade_in_readme(readme_content: str, repo_url: str):
+    total_earned = total_possible = None
+    student_ids: set[str] = set()
 
     table_match = re.search(
         r"\|\s*Total\s+Earned\s*\|\s*Total\s+Possible\s*\|[\s\S]*?\|\s*(\d+(?:\.\d+)?)\s*\|\s*(\d+(?:\.\d+)?)\s*\|",
