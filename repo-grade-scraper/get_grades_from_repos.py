@@ -158,7 +158,7 @@ def process_single_repo(repo, base_url, parsed_grades, module_type: ModuleType):
             readme_content = readme_file.read()
 
         total_earned, total_possible, student_ids = find_grade_in_readme(
-            readme_content, full_repo_url, module_type
+            readme_content, full_repo_url
         )
         if total_earned and total_possible and len(student_ids) > 0:
             for student_id in student_ids:
