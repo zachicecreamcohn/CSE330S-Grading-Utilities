@@ -52,12 +52,12 @@ class CanvasWriter:
 
         for row_dict in self.input_reader:
 
-            if row_dict["SIS User ID"] in self.grades_dict.keys() and row_dict["SIS User ID"] != "":
+            if row_dict["Integration ID"] in self.grades_dict.keys() and row_dict["Integration ID"] != "":
                 if self.args.verbose:
-                    print(f"SIS User ID: {row_dict['SIS User ID']}")
-                    print(f"Grade: {self.grades_dict[row_dict['SIS User ID']]}")
-                    print(f"Writing grade {self.grades_dict[row_dict['SIS User ID']]} to {row_dict['SIS User ID']}")
-                row_dict[self.input_reader.fieldnames[column_index]] = self.grades_dict[row_dict["SIS User ID"]]
+                    print(f"Integration ID: {row_dict['Integration ID']}")
+                    print(f"Grade: {self.grades_dict[row_dict['Integration ID']]}")
+                    print(f"Writing grade {self.grades_dict[row_dict['Integration ID']]} to {row_dict['Integration ID']}")
+                row_dict[self.input_reader.fieldnames[column_index]] = self.grades_dict[row_dict["Integration ID"]]
 
                 self.output_writer.writerow(row_dict)
 
