@@ -3,7 +3,7 @@
 ## Usage
 
 ```
-python main.py <github_org_name> <path_to_repo_names_txt>
+python main.py <path_to_repo_names_txt> <github_org_name> 
 ```
 
 - The `github_org_name` is something like cse330-spring-2025
