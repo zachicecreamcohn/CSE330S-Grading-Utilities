@@ -12,8 +12,8 @@
 | 0      | 3        | Stories can be edited and deleted                                                |          |
 | 0      | 3        | Comments can be edited and deleted                                               |          |
 | 0      | 3        | Code is well formatted and easy to read                                          |          |
-| 0      | 2        | Safe from SQL injection attacks                                                  |          |
-| 0      | 3        | Site follows FIEO                                                                |          |
+| 0      | 2        | Safe from SQL injection attacks                                                  |          | <!-- i.e. using sql prepare statements -->
+| 0      | 3        | Site follows FIEO                                                                |          | <!-- filtering input (i.e. preg_match), escaping output (i.e. htmlspecialchars, htmlentities)-->
 | 0      | 2        | All pages pass the W3C validator                                                 |          |
 | 0      | 5        | CSRF tokens are passed when creating, editing, and deleting comments/stories     |          | <!-- -2pts for each instance that CSRF tokens aren't implemented-->
 | 0      | 4        | Site is intuitive to use and navigate                                                                         |          | <!-- -2pts for each of the following: manually pressing browser back button (except viewing uploaded files), needing to do a hard refresh to make things work properly, needing to manually modify the URL -->
