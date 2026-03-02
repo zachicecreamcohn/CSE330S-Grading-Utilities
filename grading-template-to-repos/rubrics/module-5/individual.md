@@ -1,17 +1,13 @@
-| Earned | Possible | Requirement                                                                                       | Feedback |
-|--------|----------|---------------------------------------------------------------------------------------------------|-------------|
-| 0      | 3        | Calculator successfully adds, subtracts, multiplies, and divides numbers                          |             |
-| 0      | 3        | The result is automatically computed when a value is changed                                      |             |
-| 0      | 4        | Calculator is written entirely in pure, vanilla JavaScript (no libraries) and doesn't use onclick |             | <!-- -1pt for each HTML event attribute like onclick, onchange, etc instead of attaching listeners-->
-| 0      | 4        | Widget performs an AJAX request to fetch the current weather (and does so on load)                |             | <!-- -1pt if you need to manually hit the button for any information to display -->
-| 0      | 4        | The HTML template is filled in with the correct information, including the images                 |             |
-| 0      | 2        | Button to reload the weather is present and functional                                            |             |
-| 0      | 5        | Widget is written entirely in pure, vanilla JavaScript (no libraries) and doesn't use onclick     |             |<!-- -1pt for each HTML event attribute like onclick, onchange, etc instead of attaching listeners-->
+| Earned | Possible | Feature                                                                          | Feedback |
+|--------|----------|----------------------------------------------------------------------------------|-------------|
+| 0      | 5        | Node installed on instance and correct screenshot uploaded to repo               |             |
+| 0      | 4        | `hello.txt` loads correctly in browser                                           |             |
+| 0      | 4        | `brookings.jpg` loads correctly in browser                                       |             |
+| 0      | 4        | `college.html` loads correctly in browser                                        |             |
+| 0      | 4        | Visiting a file that does not exist inside the static directory results in a 404 |             |
+| 0      | 4        | Explanation of php file behavior in node server in README                        |             |
 
-
-
-## Grade
-
+## Grade    
 | Total Earned | Total Possible |
-| ------------ | -------------- |
+|--------------|----------------|
 | 0            | 25             |

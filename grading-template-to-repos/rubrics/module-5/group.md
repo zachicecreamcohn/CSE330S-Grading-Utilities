@@ -1,34 +1,46 @@
-| Earned | Possible | Requirement                                                                                                     | Feedback |
-| ------ | -------- | --------------------------------------------------------------------------------------------------------------- | -------- |
-| 0      | 5        | Calendar is displayed as a table grid with days as columns and weeks as rows, one month at a time               |          |
-| 0      | 5        | User can view different months as far in the past or future as desired                                          |          |
-| 0      | 5        | Events can be added, modified, and deleted                                                                      |          |
-| 0      | 2        | Events have a title, date, and time                                                                             |          |
-| 0      | 8        | Users can log into the site and they cannot view or manipulate events associated with other users               |          |
-| 0      | 7        | All actions are performed over AJAX, without ever needing to reload the page                                    |          |
-| 0      | 3        | Refreshing the page doesn't log the user out                                                                    |          | <!-- confirm that a session var is being set to keep track of the logged in user. If the user remains logged in on the server but it's not reflected in the ui, see the category for inuitive/easy to use/navigate-->
-| 0      | 2        | Code best practices (formatting, commenting, readability) and use of `fetch` and no `var`                       |          | <!-- 0 points if they don't use fetch or if they use "var" anywhere other than the provided calendar var-->
-| 0      | 2        | If storing passwords, they are stored salted and encrypted                                                      |          |
-| 0      | 3        | All AJAX requests that contain sensitive info or modify something on the server are performed via POST, not GET |          |
-| 0      | 3        | Safe from XSS attacks (all content is escaped on output)                                                        |          |
-| 0      | 2        | Safe from SQL injection attacks (must use prepared statements)                                                  |          |
-| 0      | 3        | CSRF token implemented OR User-Agent implementation                                                             |          |
-| 0      | 3        | Session cookie is HTTP-only                                                                                     |          |
-| 0      | 2        | Page passes W3C validator                                                                                       |          |
-| 0      | 4        | Site is intuitive and easy to use/navigate                                                                      |          | <!-- -2pts if UI thinks they're logged out on refresh -->
-| 0      | 1        | Site is visually appealing                                                                                      |          |
+| Earned | Possible | Requirement                                                                     | Feedback |
+|--------|----------|---------------------------------------------------------------------------------|-------------|
+| 0      | 5        | Users can create chat rooms with an arbitrary room name                         |             |
+| 0      | 5        | Users can join an arbitrary room                                                |             |
+| 0      | 5        | Chatroom displays a list of users in the room                                   |             |
+| 0      | 5        | Private, password protected rooms can be created                                |             |
+| 0      | 3        | Creators of room can temporarily kick users from the room                       |             |
+| 0      | 2        | Creators of room can permanently ban users from the room                        |             |
+| 0      | 1        | A user's message shows their username and is sent to everyone in the room       |             |
+| 0      | 4        | Users can send private messages to other users in the room                      |             |
+| 0      | 2        | Code is well-formated and easy to read                                          |             |
+| 0      | 2        | Site passes the [HTML5 validator](https://validator.w3.org/)                    |             |
+| 0      | 0.5      | `package.json` is included, with all dependencies needed to run the application |             |
+| 0      | 0.5      | `node_modules` is ignored by git using a `.gitignore` file                      |             |
+| 0      | 4        | Communicating with others and joining rooms is easy and intuitive               |             |
+| 0      | 1        | Site is visually appealing                                                      |             |
 
-## Creative Portion (15 possible)
-<!--- 0pts if no description in README-->
-<!--- tags that can be toggled to hide/show events-->
-<!--- users can share calendar with other users-->
-<!--- Users can create group events that display on multiple users calendars-->
+## Creative Portion (10 possible)
 
 | Earned | Feature | Feedback |
 | ------ | ------- | -------- |
 
 ## Grade
-
 | Total Earned | Total Possible |
 | ------------ | -------------- |
-| 0            | 75             |
+| 0            | 50             |
+
+
+<!-->
+
+##### Notes on grading
+0pts if there is no description in the README/there is no obvious creative portion present in their app. Here are some sample creative portions for reference. If you have any questions, ask the Head TA.
+
+Profile Icon - 5 Points
+Emoticons - 5 points
+Varying text colors for different users - 5 points
+Chat room themes - 5 points
+Joining a chat room shows previous conversations from room - 5 pts
+
+User registration with password encryption using database - 10 pts
+Saving chatrooms and conversations using database - 10pts
+Sending Pictures - 10 points
+
+-->
+
+
