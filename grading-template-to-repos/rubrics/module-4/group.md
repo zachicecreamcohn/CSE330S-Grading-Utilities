@@ -8,17 +8,23 @@
 | 0      | 7        | All actions are performed over AJAX, without ever needing to reload the page                                    |          |
 | 0      | 3        | Refreshing the page doesn't log the user out                                                                    |          | <!-- confirm that a session var is being set to keep track of the logged in user. If the user remains logged in on the server but it's not reflected in the ui, see the category for inuitive/easy to use/navigate-->
 | 0      | 2        | Code best practices (formatting, commenting, readability) and use of `fetch` and no `var`                       |          | <!-- 0 points if they don't use fetch or if they use "var" anywhere other than the provided calendar var-->
+
 | 0      | 2        | If storing passwords, they are stored salted and encrypted                                                      |          |
 | 0      | 3        | All AJAX requests that contain sensitive info or modify something on the server are performed via POST, not GET |          |
 | 0      | 3        | Safe from XSS attacks (all content is escaped on output)                                                        |          |
 | 0      | 2        | Safe from SQL injection attacks (must use prepared statements)                                                  |          |
-| 0      | 3        | CSRF token implemented OR User-Agent implementation                                                             |          |
+| 0      | 3        | CSRF token implemented when adding/editing/deleting events OR User-Agent                                        |          |
 | 0      | 3        | Session cookie is HTTP-only                                                                                     |          |
 | 0      | 2        | Page passes W3C validator                                                                                       |          |
 | 0      | 4        | Site is intuitive and easy to use/navigate                                                                      |          | <!-- -2pts if UI thinks they're logged out on refresh -->
 | 0      | 1        | Site is visually appealing                                                                                      |          |
+| 0      | 4        | Used GitHub Copilot for security analysis of at least 3 different code components                               |          |
+| 0      | 3        | Documented security audit process and findings in README.md                                                     |          |
+| 0      | 5        | AI reflection                                                                                                   |          | <!-- -4pts if no written reflection in README.md, -1pt if nothing in AI interaction log (CSE3300_AI_LOG.md) -->
+| 0      | 3        | Implemented fixes for identified security issues                                                                |          | 
 
-## Creative Portion (15 possible)
+
+## Creative Portion (10 possible)
 <!--- 0pts if no description in README-->
 <!--- tags that can be toggled to hide/show events-->
 <!--- users can share calendar with other users-->
@@ -31,4 +37,4 @@
 
 | Total Earned | Total Possible |
 | ------------ | -------------- |
-| 0            | 75             |
+| 0            | 85             |
