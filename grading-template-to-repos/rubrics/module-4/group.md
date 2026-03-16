@@ -8,7 +8,6 @@
 | 0      | 7        | All actions are performed over AJAX, without ever needing to reload the page                                    |          |
 | 0      | 3        | Refreshing the page doesn't log the user out                                                                    |          | <!-- confirm that a session var is being set to keep track of the logged in user. If the user remains logged in on the server but it's not reflected in the ui, see the category for inuitive/easy to use/navigate-->
 | 0      | 2        | Code best practices (formatting, commenting, readability) and use of `fetch` and no `var`                       |          | <!-- 0 points if they don't use fetch or if they use "var" anywhere other than the provided calendar var-->
-
 | 0      | 2        | If storing passwords, they are stored salted and encrypted                                                      |          |
 | 0      | 3        | All AJAX requests that contain sensitive info or modify something on the server are performed via POST, not GET |          |
 | 0      | 3        | Safe from XSS attacks (all content is escaped on output)                                                        |          |
