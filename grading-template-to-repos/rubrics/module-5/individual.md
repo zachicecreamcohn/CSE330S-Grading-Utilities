@@ -1,13 +1,14 @@
 | Earned | Possible | Feature                                                                          | Feedback |
 |--------|----------|----------------------------------------------------------------------------------|-------------|
-| 0      | 5        | Node installed on instance and correct screenshot uploaded to repo               |             |
+| 0      | 5        | Node installed on instance and correct screenshot uploaded to repo               |             | <!-- screenshot should be of college.html on their server on port 3456, the url needs to be visible in the screenshot to get points -->
 | 0      | 4        | `hello.txt` loads correctly in browser                                           |             |
 | 0      | 4        | `brookings.jpg` loads correctly in browser                                       |             |
 | 0      | 4        | `college.html` loads correctly in browser                                        |             |
 | 0      | 4        | Visiting a file that does not exist inside the static directory results in a 404 |             |
-| 0      | 4        | Explanation of php file behavior in node server in README                        |             |
+| 0      | 4        | Correct explanation of php file behavior in node server in README                        |             |
+| 0      | 5        | AI reflection                                                                                     |          | <!-- -4pts if no written reflection in README.md, -1pt if nothing in AI interaction log (CSE3300_AI_LOG.md) -->
 
 ## Grade    
 | Total Earned | Total Possible |
 |--------------|----------------|
-| 0            | 25             |
+| 0            | 30             |

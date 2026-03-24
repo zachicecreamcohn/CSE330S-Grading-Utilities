@@ -10,10 +10,12 @@
 | 0      | 4        | Users can send private messages to other users in the room                      |             |
 | 0      | 2        | Code is well-formated and easy to read                                          |             |
 | 0      | 2        | Site passes the [HTML5 validator](https://validator.w3.org/)                    |             |
-| 0      | 0.5      | `package.json` is included, with all dependencies needed to run the application |             |
-| 0      | 0.5      | `node_modules` is ignored by git using a `.gitignore` file                      |             |
+| 0      | 1        | `node_modules` is ignored by git using a `.gitignore` file                      |             |
 | 0      | 4        | Communicating with others and joining rooms is easy and intuitive               |             |
 | 0      | 1        | Site is visually appealing                                                      |             |
+| 0      | 10       | Implement an AI assistant accessible via the command \agent that replies in the current room |             |
+| 0      | 5        | Handles basic errors gracefully an does not crash the server                    |             |
+| 0      | 5        | AI reflection                                                                   |             | <!-- -4pts if no written reflection in README.md, -1pt if nothing in AI interaction log (CSE3300_AI_LOG.md) -->
 
 ## Creative Portion (10 possible)
 
@@ -23,10 +25,10 @@
 ## Grade
 | Total Earned | Total Possible |
 | ------------ | -------------- |
-| 0            | 50             |
+| 0            | 70             |
 
 
-<!-->
+<!--
 
 ##### Notes on grading
 0pts if there is no description in the README/there is no obvious creative portion present in their app. Here are some sample creative portions for reference. If you have any questions, ask the Head TA.
